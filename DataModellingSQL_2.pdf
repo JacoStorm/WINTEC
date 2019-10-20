@@ -1,0 +1,271 @@
+--JACO STORM
+--15435194
+
+ /*
+	Questions 1 (CREATE PROCEDURE)
+	
+	1.1		Create procedures
+			Customer Details - Displays a customer’s details from a given customer id 
+			in detail form. The procedure accepts a customer’s id and displays all 
+			the customer's details.
+ */
+ 
+CREATE OR REPLACE PROCEDURE	cust_detail (cust_id IN XQC_customers.C_ID%TYPE) IS
+BEGIN
+
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	DBMS_OUTPUT.PUT_LINE(CUSTOMER DETAILS:);
+	
+	SELECT c_id, c_ph, c_fname, c_lname, c_address1
+	FROM XQC_customers
+	WHERE cust_id = C_ID;
+	
+	DBMS_OUTPUT.PUT_LINE();
+	DBMS_OUTPUT.PUT_LINE('CUST ID: ' || c_id || CHR(10) || 'PH: ' || c_ph);
+	DBMS_OUTPUT.PUT_LINE('CUSTOMER NAME: ' || c_fname || ', ' || c_lname);
+	DBMS_OUTPUT.PUT_LINE('ADDRESS : ' || c_address1);	
+	DBMS_OUTPUT.PUT_LINE();
+END;
+-- CALLING
+EXECUTE cust_detail(1);
+
+/*
+	1.2		Vehicle Details - Displays vehicle details from a given registration. 
+			The procedure accepts the vehicles registration and displays all 
+			the vehicle details.
+*/
+CREATE OR REPLACE PROCEDURE disp_rego (given_rego IN XQC_vehicles.v_regno%TYPE) IS
+ BEGIN
+	SELECT *
+	FROM XQC_vehicles
+	WHERE v_regno = given_rego;
+	
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	DBMS_OUTPUT.PUT_LINE('VEHICLE DETAILS: ');
+	DBMS_OUTPUT.PUT_LINE();
+	DBMS_OUTPUT.PUT_LINE('REGISTRAITION: ' || v_regno);
+	DBMS_OUTPUT.PUT_LINE('YEAR: ' || v_year || CHR(9) || 'MAKE: ' || v_make || CHR(9) || 'MODEL :' || v_model);
+	DBMS_OUTPUT.PUT_LINE('COLOUR: ' || c_no || CHR(9) || 'OWNERS: ' || v_numowners || CHR(9) || 'MILEAGE :' || v_miledge);
+	DBMS_OUTPUT.PUT_LINE('PRICE: ' || v_price);
+	DBMS_OUTPUT.PUT_LINE();
+ END;
+ -- CAllING
+ 
+ EXECUTE disp_rego(OMG765);
+ 
+ 
+ 
+-- 1.3
+
+
+
+CREATE OR REPLACE PROCEDURE disp_salesRep (SalePerson_id IN XQC_sales_persons.sp_id%TYPE) IS
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	DBMS_OUTPUT.PUT_LINE(SALES PERSON DETAILS:);
+	DBMS_OUTPUT.PUT_LINE();
+	
+	SELECT *
+	FROM XQC_sales_persons
+	WHERE sp_id = SalePerson_id;
+	
+	DBMS_OUTPUT.PUT_LINE('SP ID: ' || sp_id);
+	DBMS_OUTPUT.PUT_LINE('SALES PERSON NAME: ' || sp_fname || ', ' || sp_lname);
+	DBMS_OUTPUT.PUT_LINE('COLOUR: ' || c_no || CHR(9) || 'OWNERS: ' || v_numowners || CHR(9) || 'MILEAGE :' || v_miledge);
+	DBMS_OUTPUT.PUT_LINE('PRICE: ' || v_price);
+	DBMS_OUTPUT.PUT_LINE();
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	
+END;
+--CALLING
+ EXECUTE disp_salesRep(KH981);
+
+ 
+
+ -- 1.4
+ 
+ 
+ 
+ CREATE OR REPLACE PROCEDURE disp_sold_Veh_det (invoice_no IN XQC_sales_purchases.sp_datesold%TYPE) IS
+
+ BEGIN
+		-- DISP cust who bought veh by cust_detail (cust_id IN VARCHAR(30))
+		-- DISP veh details by disp_rego (given_rego IN VARCHAR2(7))
+		-- Disp purchase sale of vehicle
+		-- DISP sale purshace details
+		-- DISP Sales person details by disp_salesRep (SalePerson_id IN VARCHAR2(5))
+
+		-- unsure what to SELECT
+		
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	DBMS_OUTPUT.PUT_LINE('#   P U R C H A S E  -  S A L E  -  S U M M A R Y   #');
+	DBMS_OUTPUT.PUT_LINE('#'||CHR(48)||'#');
+	DBMS_OUTPUT.PUT_LINE('#'||CHR(9)|| 'INVOICE NO: ' || invoice_no || CHR(19)|| '#');
+	DBMS_OUTPUT.PUT_LINE('##################################################');
+	DBMS_OUTPUT.PUT_LINE('');
+	
+		SELECT * 
+		INTO veh
+		FROM XQC_sales_purchases
+		WHERE invoice_no = SP_invoice;
+		
+		EXECUTE cust_detail();
+		EXECUTE disp_salesRep();
+		
+		DBMS_OUTPUT.PUT_LINE('##################################################');
+		DBMS_OUTPUT.PUT_LINE();
+		DBMS_OUTPUT.PUT_LINE('SALES PURCHASE:');
+		DBMS_OUTPUT.PUT_LINE();
+		DBMS_OUTPUT.PUT_LINE('PURCHASE DATE: ' || sp_datesold);
+		DBMS_OUTPUT.PUT_LINE( CHR(8) || 'SALE PRICE: ' || CHR(10) || sp_salesprice);
+		DBMS_OUTPUT.PUT_LINE( CHR(8) || 'ADDITIONAL COST: ' || CHR(10) || sp_addncost);
+		DBMS_OUTPUT.PUT_LINE( CHR(8) || 'DEPOSIT: ' || CHR(10) || sp_deposit);
+		DBMS_OUTPUT.PUT_LINE();
+		DBMS_OUTPUT.PUT_LINE( CHR(8) || 'TOTAL:' || CHR(16) || sp_total);
+		
+ END;
+ 
+ EXECUTE disp_salesRep(MK201);
+
+ 
+ 
+ /*
+	1.5		Create a procedure named ReportSummarySalesPeriod() that 
+			displays MAX as “Max”, MIN as “Min”, COUNT as “Amount”, SUM as “Total”, 
+			and AVG as “AVG for all the vehicles sold thus far. All displays should 
+			include ‘$’ and TWO decimal places and are according to Sale Price or Order 
+			Total unless specified
+				1.5.1	Include a function NumberOfDays() that calculates the number 
+						of days the report covers. The function accepts the start and end 
+						date period, then returns how many days it covers. This should be 
+						called from the ReportSummarySalesPeriod() procedure and included 
+						in the report. (10 Marks)
+*/
+CREATE OR REPLACE PROCEDURE  ReportSummarySalesPeriod(start_date IN XQC_sales_purchases.sp_datesold%TYPE, end_date IN XQC_sales_purchases.sp_datesold%TYPE)
+IS
+CURSOR NumDays_cur IS
+
+	SELECT COUNT( SUM(sp_saleprice)"TOTAL", MAX(sp_saleprice)"MAX", MIN(sp_saleprice)"MIN", AVG(sp_saleprice)"AVG", COUNT(sp_id)"AMMOUNT"
+	FROM XQC_sales_purchases
+	WHERE sp_datesold BETWEEN start_date AND end_date;
+	
+row NumDays_cur%ROWTYPE;
+	
+BEGIN
+	FOR row IN NumDays_cur LOOP
+
+		DBMS_OUTPUT.PUT_LINE('##################################################');
+		DBMS_OUTPUT.PUT_LINE('#     ORDERS - REPORT - STATISTICS - SUMMARY     #');
+		DBMS_OUTPUT.PUT_LINE('#'||CHR(48)||'#');
+		DBMS_OUTPUT.PUT_LINE('#'||CHR(12)||	'FROM'||start_date||'to'||end_date||CHR(12)||'#');
+		DBMS_OUTPUT.PUT_LINE('##################################################');
+		
+		DBMS_OUTPUT.PUT_LINE('Number of days reported: '||numberOfDays(start_date,end_date) || CHR(4));
+		DBMS_OUTPUT.PUT_LINE('TOTAL'||CHR(18)||'MAX'||CHR(18)||'MIN'||CHR(18)||'AVG'||CHR()18||'AMMOUNT');
+		DBMS_OUTPUT.PUT_LINE('-----'||CHR(18)||'---'||CHR(18)||'---'||CHR(18)||'---'||CHR()18||'-------');
+		DBMS_OUTPUT.PUT_LINE(row.MAX||CHR(18)||row.MAX||CHR(18)||row.MIN||CHR(18)||row.AVG||CHR(18)||row.AMMOUNT);
+		
+	END LOOP;
+END;
+
+ReportSummarySalesPeriod(05-Jun-2015, 20-Aug-2016);
+
+CREATE OR REPLACE FUNCTION numberOfDays(start_date IN XQC_sales_purchases.sp_datesold%TYPE, end_date IN XQC_sales_purchases.sp_datesold%TYPE)
+RETURN NUMBER IS 
+	sumDays NUMBER(3);
+BEGIN
+	sumdays := end_date - start_date;
+	RETURN sumDays;
+END;
+
+
+
+
+ -- Maintenance
+ /*
+	Questions 2		The design of the database requires fields to be updated for formula 
+					calculations or cross-table field updates upon data insertion. These 
+					occur on the Sales Purchase, Order Line and Orders Tables. 
+					For maintenance and efficiency the following procedures are created 
+					to automate the process.
+	2.1	The design of the database requires fields to be updated for formula calculations 
+		or cross-table field updates upon data insertion. These occur on the Sales Purchase, 
+		Order Line and  Tables. For maintenance and efficiency the following procedures 
+		are created to automate the process.
+		
+	2.2	Add the UPDATE formulas for the Additional Cost and Total fields from the assignment script.
+		If the purchase is successful, then it should COMMIT the transaction - any errors should display an 
+		appropriate error message and ROLLBACK the transaction
+		
+		Test the procedure with test data to show it works
+ */
+ CREATE OR REPLACE PROCEDURE AddPurchaseSale(invoice_no IN XQC_sales_purchases.sp_id%TYPE)
+ BEGIN
+ 
+ 
+ END;
+
+ 
+ /*
+		3.1		A supervisor can supervise no more than 2 people. This trigger should 
+				occur on INSERT and UPDATE from the sales persons table
+ */
+CREATE OR REPLACE TRIGGER sup_limit_check
+INSERT OR UPDATE XQC_sales_persons
+FOR EACH ROW
+DECLARE 
+	counter INTEGER :=0;
+	sup VARCHAR2(5);
+BEGIN 
+	SELECT COUNT(sp_sup) 
+	INTO counter
+	FROM XQC_sales_persons
+	WHERE sp_sup = :NEW.sp_sup;
+	IF counter <2 THEN
+		RAISE_APPLICATION_ERROR('ERROR - ' || sp_sup || ' is supervising too many people');
+	END IF;
+	
+END sup_limit_check;
+ /*
+		3.2		Only supervisors can order items.
+ */
+CREATE OR REPLACE TRIGGER sup_only
+INSERT OR UPDATE ON XQC_order_lines
+FOR EACH ROW
+DECLARE 
+	sup NUMBER;
+BEGIN
+	SELECT COUNT(SP_sup) 
+	INTO sup
+	FROM XQC_sales_persons
+	WHERE sp_id = :NEW.sp_id;
+	
+	IF sup <= 0 THEN
+		RAISE_APPLICATION_ERROR('Only supervisors can place orders');
+	END If;
+END sup_only;
+ -- PACKAGE(DONE: Yes / No)
+ 
+ /*
+	Question 4		With all the procedures that have been created in questions 1 and 1. 
+					Package the procedures into the following
+			
+			4.1		XQC_Details: Which includes the Customer, SalesPerson and Vehicle 
+					detail procedures from 1.1, 1.2 and 1. 3.
+				
+			4.2		XQC_New: Which includes procedures from 2.1 and 2.2
+ */
+ 
+ CREATE OR REPLACE PACKAGE XQC_Details AS
+	 cust_detail (cust_id IN XQC_customers.C_ID%TYPE)
+	 disp_rego (given_rego IN XQC_vehicles.v_regno%TYPE)
+	 disp_salesRep (SalePerson_id IN XQC_sales_persons.sp_id%TYPE)
+END XQC_Details;
+
+CREATE OR REPLACE PACKAGE XQC_New AS
+	AddPurchaseSale(invoice_no IN XQC_sales_purchases.sp_id%TYPE);
+END XQC_New;
+ 
+ 
+ 
+ -- Remember to compile assignment into PDF
